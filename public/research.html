@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Polymarket Research Bot</title>
+    <style>
+      :root {
+        --fg: #111;
+        --muted: #666;
+        --bg: #fff;
+        --line: #e3e3e3;
+        --soft: #f5f5f5;
+        --ok-bg: #e8f5ea;
+        --ok-fg: #1b5e20;
+        --warn-bg: #fff4e0;
+        --warn-fg: #6a3e00;
+        --err-bg: #fdecea;
+        --err-fg: #8c1d17;
+        --accent: #2a5dd0;
+        --premium: #6d28d9;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font: 14px/1.6 -apple-system, system-ui, sans-serif;
+        max-width: 860px;
+        margin: 32px auto;
+        padding: 0 16px 64px;
+        color: var(--fg);
+        background: var(--bg);
+      }
+      h1 { margin: 0 0 4px; font-size: 22px; }
+      h2 { margin: 28px 0 8px; font-size: 16px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+      h3 { margin: 12px 0 4px; font-size: 13px; font-weight: 600; }
+      p { margin: 4px 0; color: var(--muted); }
+      button {
+        font: inherit; padding: 9px 18px; cursor: pointer;
+        background: var(--accent); color: #fff; border: none;
+        border-radius: 6px; font-weight: 500;
+      }
+      button:disabled { opacity: 0.45; cursor: not-allowed; }
+      button.secondary {
+        background: var(--soft); color: var(--fg);
+        border: 1px solid var(--line);
+      }
+      input[type="text"] {
+        font: inherit; padding: 9px 12px;
+        border: 1px solid var(--line); border-radius: 6px;
+        width: 100%; max-width: 560px;
+        outline: none;
+      }
+      input[type="text"]:focus { border-color: var(--accent); }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; background: var(--soft); padding: 1px 5px; border-radius: 3px; }
+      pre {
+        background: var(--soft); padding: 10px 12px; border-radius: 6px;
+        overflow: auto; font-size: 12px; margin: 6px 0; white-space: pre-wrap;
+        font-family: ui-monospace, Menlo, monospace;
+      }
+      .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+      .badge {
+        padding: 2px 8px; border-radius: 12px;
+        font-size: 11px; font-weight: 600; display: inline-block;
+        background: #eef; color: var(--fg);
+      }
+      .badge.ok    { background: var(--ok-bg);   color: var(--ok-fg); }
+      .badge.warn  { background: var(--warn-bg);  color: var(--warn-fg); }
+      .badge.err   { background: var(--err-bg);   color: var(--err-fg); }
+      .badge.muted { background: var(--soft);     color: var(--muted); }
+      .badge.premium { background: #ede9fe; color: var(--premium); }
+      table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 8px 0; }
+      th, td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+      th { background: var(--soft); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+      td.r { text-align: right; }
+      .prob-bar {
+        display: inline-block; height: 6px; border-radius: 3px;
+        background: var(--accent); vertical-align: middle; margin-right: 6px;
+      }
+      .source-card {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 10px 14px; margin: 6px 0; background: var(--soft);
+      }
+      .source-card .src-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+      .source-card p { font-size: 13px; color: var(--fg); margin: 0; }
+      .verdict-box {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 16px 20px; margin: 8px 0;
+        background: var(--soft);
+      }
+      .verdict-box.mispriced { border-color: #fca5a5; background: #fef2f2; }
+      .verdict-box.accurate  { border-color: #86efac; background: #f0fdf4; }
+      .payment-card {
+        border: 1px solid #ddd6fe; border-radius: 8px;
+        padding: 10px 14px; margin: 6px 0;
+        background: #faf5ff;
+        font-size: 13px;
+      }
+      .payment-card .pay-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+      .progress-log {
+        background: #0f172a; color: #94a3b8; border-radius: 8px;
+        padding: 12px 16px; font-family: ui-monospace, Menlo, monospace;
+        font-size: 12px; max-height: 180px; overflow-y: auto;
+        margin: 12px 0;
+      }
+      .progress-log .line { margin: 2px 0; }
+      .progress-log .line.current { color: #e2e8f0; }
+      .progress-log .line.done { color: #4ade80; }
+      .spinner {
+        display: inline-block; width: 12px; height: 12px;
+        border: 2px solid #4ade80; border-top-color: transparent;
+        border-radius: 50%; animation: spin 0.7s linear infinite;
+        vertical-align: middle; margin-right: 6px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .search-section { margin: 20px 0; }
+      .examples {
+        display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0;
+      }
+      .example-chip {
+        padding: 4px 12px; border-radius: 16px; border: 1px solid var(--line);
+        background: var(--soft); font-size: 12px; cursor: pointer; color: var(--accent);
+      }
+      .example-chip:hover { background: #eef3ff; border-color: var(--accent); }
+      #results { display: none; }
+      .section { margin: 20px 0; }
+      .budget-bar-wrap {
+        background: var(--line); border-radius: 4px; height: 6px;
+        width: 200px; display: inline-block; vertical-align: middle; margin-left: 8px;
+      }
+      .budget-bar-fill {
+        height: 100%; border-radius: 4px; background: var(--accent);
+        transition: width 0.4s;
+      }
+      .no-markets {
+        color: var(--muted); font-style: italic; padding: 12px 0;
+      }
+      .confidence-high  { color: var(--ok-fg); }
+      .confidence-medium { color: var(--warn-fg); }
+      .confidence-low   { color: var(--err-fg); }
+      nav {
+        display: flex; gap: 16px; margin-bottom: 24px; padding-bottom: 12px;
+        border-bottom: 1px solid var(--line); font-size: 13px;
+      }
+      nav a { color: var(--muted); }
+      nav a.active { color: var(--accent); font-weight: 600; }
+      .tag-premium {
+        font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+        background: #ede9fe; color: var(--premium); padding: 2px 7px;
+        border-radius: 10px; vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="/research.html" class="active">Research Bot</a>
+      <a href="/buyer.html">Payment Trace</a>
+    </nav>
+
+    <h1>Polymarket Research Bot</h1>
+    <p>Fetches live prediction market odds, researches free sources (Wikipedia, DuckDuckGo, Google News), and — when free data isn't enough — autonomously pays for premium gpt-4o analysis via x402 on Arc Testnet.</p>
+    <p style="margin-top:6px;color:var(--muted);font-size:12px;">Session budget: <strong style="color:var(--fg)">$0.10 USDC</strong> &nbsp;·&nbsp; Premium deep analysis: <strong style="color:var(--fg)">$0.05</strong></p>
+
+    <div class="search-section">
+      <div class="row">
+        <input type="text" id="topicInput" placeholder="Who will win the 2026 midterms?" />
+        <button id="searchBtn">Research</button>
+      </div>
+      <div class="examples">
+        <span class="example-chip" data-topic="Who will win the 2026 US midterm elections?">2026 midterms</span>
+        <span class="example-chip" data-topic="Will the Federal Reserve cut interest rates in 2026?">Fed rate cuts</span>
+        <span class="example-chip" data-topic="Will Bitcoin reach $200,000 in 2026?">Bitcoin $200k</span>
+        <span class="example-chip" data-topic="FIFA World Cup 2026 winner">World Cup winner</span>
+        <span class="example-chip" data-topic="Will there be a US recession in 2026?">US recession 2026</span>
+        <span class="example-chip" data-topic="Will OpenAI release GPT-5 in 2026?">GPT-5 release</span>
+      </div>
+    </div>
+
+    <div id="progressSection" style="display:none">
+      <h2>Researching…</h2>
+      <div class="progress-log" id="progressLog"></div>
+    </div>
+
+    <div id="results">
+      <h2>Research Report</h2>
+
+      <div class="section">
+        <div class="row" id="reportMeta"></div>
+      </div>
+
+      <div class="section" id="marketsSection">
+        <h2>📈 Polymarket Markets</h2>
+        <div id="marketsContent"></div>
+      </div>
+
+      <div class="section" id="sourcesSection">
+        <h2>📚 Free Research Sources</h2>
+        <div id="sourcesContent"></div>
+      </div>
+
+      <div class="section" id="premiumSection" style="display:none">
+        <h2>🔬 Premium Analysis <span class="tag-premium">gpt-4o · $0.05 via x402</span></h2>
+        <pre id="premiumContent"></pre>
+      </div>
+
+      <div class="section" id="paymentsSection" style="display:none">
+        <h2>💳 x402 Payments</h2>
+        <div id="paymentsContent"></div>
+      </div>
+
+      <div class="section">
+        <h2>🎯 Verdict</h2>
+        <div id="verdictBox" class="verdict-box"></div>
+      </div>
+
+      <div class="section">
+        <h2>💰 Session Budget</h2>
+        <div id="budgetContent"></div>
+      </div>
+
+      <div style="margin-top:24px">
+        <button class="secondary" id="newSearchBtn">New Search</button>
+      </div>
+    </div>
+
+    <script>
+      const topicInput = document.getElementById("topicInput");
+      const searchBtn = document.getElementById("searchBtn");
+      const progressSection = document.getElementById("progressSection");
+      const progressLog = document.getElementById("progressLog");
+      const resultsDiv = document.getElementById("results");
+
+      function escHtml(s) {
+        return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+      }
+
+      document.querySelectorAll(".example-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          topicInput.value = chip.dataset.topic;
+          topicInput.focus();
+        });
+      });
+
+      document.getElementById("newSearchBtn").addEventListener("click", () => {
+        resultsDiv.style.display = "none";
+        progressSection.style.display = "none";
+        progressLog.innerHTML = "";
+        topicInput.value = "";
+        topicInput.focus();
+      });
+
+      topicInput.addEventListener("keydown", e => {
+        if (e.key === "Enter") searchBtn.click();
+      });
+
+      let activeEventSource = null;
+
+      searchBtn.addEventListener("click", () => {
+        const topic = topicInput.value.trim();
+        if (!topic) { topicInput.focus(); return; }
+
+        if (activeEventSource) { activeEventSource.close(); activeEventSource = null; }
+
+        searchBtn.disabled = true;
+        resultsDiv.style.display = "none";
+        progressSection.style.display = "block";
+        progressLog.innerHTML = `<div class="line current"><span class="spinner"></span>Starting research for: <em>${escHtml(topic)}</em></div>`;
+
+        const es = new EventSource(`/api/research?topic=${encodeURIComponent(topic)}`);
+        activeEventSource = es;
+
+        es.addEventListener("progress", e => {
+          const { step } = JSON.parse(e.data);
+          const prev = progressLog.querySelector(".line.current");
+          if (prev) { prev.classList.remove("current"); prev.classList.add("done"); prev.innerHTML = "✓ " + prev.innerHTML.replace(/<span class="spinner"><\/span>/, ""); }
+          const line = document.createElement("div");
+          line.className = "line current";
+          line.innerHTML = `<span class="spinner"></span>${escHtml(step)}`;
+          progressLog.appendChild(line);
+          progressLog.scrollTop = progressLog.scrollHeight;
+        });
+
+        es.addEventListener("report", e => {
+          es.close();
+          activeEventSource = null;
+          searchBtn.disabled = false;
+          const report = JSON.parse(e.data);
+          renderReport(report);
+        });
+
+        es.addEventListener("error", e => {
+          es.close();
+          activeEventSource = null;
+          searchBtn.disabled = false;
+          let msg = "Research failed.";
+          try { msg = JSON.parse(e.data).message; } catch {}
+          progressLog.innerHTML += `<div class="line" style="color:#f87171">✗ Error: ${escHtml(msg)}</div>`;
+        });
+
+        es.onerror = () => {
+          if (es.readyState === EventSource.CLOSED) return;
+          es.close();
+          activeEventSource = null;
+          searchBtn.disabled = false;
+          progressLog.innerHTML += `<div class="line" style="color:#f87171">✗ Connection lost.</div>`;
+        };
+      });
+
+      function renderReport(report) {
+        progressSection.style.display = "none";
+        resultsDiv.style.display = "block";
+
+        // Meta badges
+        const conf = report.confidence;
+        const confCls = conf === "high" ? "ok" : conf === "medium" ? "warn" : "err";
+        document.getElementById("reportMeta").innerHTML = `
+          <span class="badge muted">${escHtml(report.topic)}</span>
+          <span class="badge ${confCls}">Confidence: ${conf}</span>
+          ${report.isMispriced === true ? '<span class="badge err">⚠ Market may be mispriced</span>' : report.isMispriced === false ? '<span class="badge ok">✓ Market appears accurate</span>' : '<span class="badge muted">Pricing unclear</span>'}
+          ${report.payments.length > 0 ? '<span class="badge premium">💳 x402 paid</span>' : ''}
+        `;
+
+        // Markets
+        const mc = document.getElementById("marketsContent");
+        if (!report.markets.length) {
+          mc.innerHTML = `<p class="no-markets">No active Polymarket markets found for this topic.</p>`;
+        } else {
+          mc.innerHTML = report.markets.map(m => {
+            const outcomesHtml = m.outcomes.map(o => {
+              const pct = Math.min(100, Math.max(0, o.probability));
+              const barW = Math.round(pct);
+              return `<tr>
+                <td>${escHtml(o.outcome)}</td>
+                <td><span class="prob-bar" style="width:${barW}px"></span>${pct.toFixed(1)}%</td>
+              </tr>`;
+            }).join("");
+            return `<div class="source-card">
+              <div class="src-header">
+                <strong>${escHtml(m.question)}</strong>
+                <span class="badge muted">Vol $${Number(m.volume).toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                ${m.endDate ? `<span class="badge muted">Closes ${m.endDate.slice(0,10)}</span>` : ""}
+                <a href="${escHtml(m.url)}" target="_blank" rel="noreferrer" style="font-size:11px;margin-left:auto">View on Polymarket →</a>
+              </div>
+              <table>
+                <thead><tr><th>Outcome</th><th>Probability</th></tr></thead>
+                <tbody>${outcomesHtml}</tbody>
+              </table>
+            </div>`;
+          }).join("");
+        }
+
+        // Sources
+        const sc = document.getElementById("sourcesContent");
+        if (!report.freeResearch.length) {
+          sc.innerHTML = `<p class="no-markets">No free sources returned data for this topic.</p>`;
+        } else {
+          sc.innerHTML = report.freeResearch.map(s => `
+            <div class="source-card">
+              <div class="src-header">
+                <span class="badge">${escHtml(s.source)}</span>
+                <a href="${escHtml(s.url)}" target="_blank" rel="noreferrer" style="font-size:11px">${escHtml(s.url.slice(0,60))}…</a>
+              </div>
+              <p>${escHtml(s.summary.slice(0, 400))}${s.summary.length > 400 ? "…" : ""}</p>
+            </div>
+          `).join("");
+        }
+
+        // Premium analysis
+        const ps = document.getElementById("premiumSection");
+        const pc = document.getElementById("premiumContent");
+        if (report.premiumAnalysis) {
+          ps.style.display = "block";
+          pc.textContent = report.premiumAnalysis;
+        } else {
+          ps.style.display = "none";
+        }
+
+        // Payments
+        const pays = document.getElementById("paymentsSection");
+        const payc = document.getElementById("paymentsContent");
+        if (report.payments.length) {
+          pays.style.display = "block";
+          payc.innerHTML = report.payments.map(p => `
+            <div class="payment-card">
+              <div class="pay-header">
+                <span class="badge premium">x402</span>
+                <strong>${escHtml(p.amountUsdc)} USDC</strong>
+                <span style="color:var(--muted)">→ <code>${escHtml(p.endpoint)}</code></span>
+              </div>
+              <div style="color:var(--muted);font-size:12px">${escHtml(p.purpose)}</div>
+              ${p.settlementId ? `<div style="margin-top:4px;font-size:11px;color:var(--muted)">Settlement: <code>${escHtml(p.settlementId)}</code></div>` : ""}
+            </div>
+          `).join("");
+        } else {
+          pays.style.display = "none";
+        }
+
+        // Verdict
+        const vb = document.getElementById("verdictBox");
+        const vClass = report.isMispriced === true ? "mispriced" : report.isMispriced === false ? "accurate" : "";
+        vb.className = `verdict-box ${vClass}`;
+        vb.innerHTML = `
+          <p style="font-size:15px;color:var(--fg);margin:0 0 8px;font-weight:500">${escHtml(report.verdict)}</p>
+          ${report.initialAssessment ? `<details><summary style="cursor:pointer;color:var(--muted);font-size:12px">Initial assessment</summary><p style="font-size:13px;margin-top:6px">${escHtml(report.initialAssessment)}</p></details>` : ""}
+        `;
+
+        // Budget
+        const total = report.budgetUsedUsdc + report.budgetRemainingUsdc;
+        const pct = total > 0 ? (report.budgetUsedUsdc / total) * 100 : 0;
+        document.getElementById("budgetContent").innerHTML = `
+          <div class="row" style="gap:12px;align-items:center">
+            <span>$${report.budgetUsedUsdc.toFixed(2)} used</span>
+            <div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:${pct}%"></div></div>
+            <span style="color:var(--muted)">$${total.toFixed(2)} total</span>
+          </div>
+          <p style="margin-top:6px">$${report.budgetRemainingUsdc.toFixed(2)} remaining for this session</p>
+          ${report.payments.length === 0 && report.budgetUsedUsdc === 0 ? `<p style="color:var(--muted);font-size:12px">No x402 payments were made — free sources were sufficient (or wallet not configured).</p>` : ""}
+        `;
+
+        window.scrollTo({ top: document.getElementById("results").offsetTop - 20, behavior: "smooth" });
+      }
+    </script>
+  </body>
+</html>
