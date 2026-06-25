@@ -76,6 +76,8 @@ Internally, the client:
 
 The Circle relayer watches for settled authorizations and periodically calls `submitBatch()` on the `GatewayWallet` contract on Arc Testnet — bundling multiple payments into a single transaction. On testnet expect ~10 minutes; on a busy mainnet it would be seconds.
 
+Arc has sub-second deterministic finality — once the batch lands on-chain it is immediately irreversible, with no waiting for confirmations.
+
 ### 4. The agent enforces its own budget
 
 `research-agent.ts` tracks spend locally before attempting any payment:
@@ -149,15 +151,57 @@ The middleware populates `req.payment` with `{ payer, amount, network, transacti
 
 ---
 
-## Network constants
+## Arc network constants
 
 | Constant | Value |
 |---|---|
-| Arc Testnet chain ID | `eip155:5042002` |
+| Chain ID | `eip155:5042002` |
+| RPC endpoint | `https://rpc.testnet.arc.network` |
 | Circle Gateway (testnet) | `https://gateway-api-testnet.circle.com` |
-| Arc block explorer | `https://testnet.arcscan.app` |
+| Block explorer | `https://testnet.arcscan.app` |
 | GatewayWallet contract | `0x0077777d7EBA4688BDeF3E311b846F25870A19B9` |
 | Seller address | `0x933a2405f84c224be1ef373ba16e992e1f459682` |
+| Gas token | USDC (not ETH — Arc uses USDC as its native gas token) |
+
+---
+
+## Arc Agentic Economy standards
+
+Arc has two EVM standards purpose-built for autonomous agents. Neither is implemented in PolyArc yet, but both are natural next steps.
+
+### ERC-8004 — Onchain agent identity
+
+ERC-8004 provides a native registry for agent identity, reputation events, and credential verification on Arc. Registering PolyArc under this standard would give it a verifiable onchain identity — other agents, users, and contracts could look up its track record of completed analyses and payments.
+
+Docs: [docs.arc.io/arc/tutorials/register-your-first-ai-agent](https://docs.arc.io/arc/tutorials/register-your-first-ai-agent)
+
+### ERC-8183 — Job escrow and USDC settlement
+
+ERC-8183 defines the full job lifecycle: creation, escrow funding, deliverable submission, evaluation, and USDC settlement. PolyArc's premium analysis requests are a natural fit — instead of a direct x402 payment, a user could open a job, fund USDC escrow, receive the analysis as a deliverable, approve it, and trigger settlement. This makes every analysis request verifiable and disputable on-chain.
+
+Docs: [docs.arc.io/arc/tutorials/create-your-first-erc-8183-job](https://docs.arc.io/arc/tutorials/create-your-first-erc-8183-job)
+
+---
+
+## Unified Balance — funding the agent from any chain
+
+Currently the agent wallet must hold USDC on Arc Testnet specifically. Arc's [Unified Balance](https://docs.arc.io/app-kit/unified-balance) API (from `@circle-fin/unified-balance-kit`) combines USDC from multiple chains — Base, Solana, Ethereum, Arc — into a single instantly spendable pool.
+
+Integrating Unified Balance would let users fund the agent from any chain they already hold USDC on, without bridging manually. The spend side would still target Arc Testnet.
+
+```typescript
+import { AppKit } from '@circle-fin/app-kit';
+
+const kit = new AppKit();
+
+// deposit from any chain
+await kit.unifiedBalance.deposit({ from: { adapter, chain: 'Base_Sepolia' }, amount: '1.00', token: 'USDC' });
+
+// spend on Arc — same API regardless of deposit source
+await kit.unifiedBalance.spend({ amount: '0.05', token: 'USDC', from: [{ adapter }], to: { adapter, chain: 'Arc_Testnet', recipientAddress: SELLER } });
+```
+
+Quickstart: [docs.arc.io/app-kit/quickstarts/unified-balance-deposit-and-spend](https://docs.arc.io/app-kit/quickstarts/unified-balance-deposit-and-spend)
 
 ---
 

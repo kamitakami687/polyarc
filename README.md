@@ -79,13 +79,24 @@ polyarc/
 
 | Layer | What it uses |
 |---|---|
-| Blockchain | Arc Testnet — Circle's stablecoin L1, USDC as native gas |
-| Payments | x402 protocol and Circle Gateway — sub-cent USDC payments |
+| Blockchain | Arc Testnet — Circle's stablecoin L1, USDC as native gas token |
+| Payments | x402 protocol and Circle Gateway — EIP-712 signed USDC micropayments |
 | AI | OpenAI GPT-4o for premium analysis, GPT-4o mini for routing |
-| Market data | Polymarket public API |
-| Free research | Wikipedia API, DuckDuckGo, Google News |
-| Backend | Node.js, TypeScript |
-| Frontend | HTML, CSS, JavaScript |
+| Market data | Polymarket Gamma API |
+| Free research | Wikipedia API, DuckDuckGo Instant Answer, Google News RSS |
+| Backend | Node.js 20+, TypeScript, Express 5 |
+| Frontend | HTML, CSS, JavaScript (no framework) |
+
+---
+
+## Arc Network — Key Properties
+
+PolyArc is built on Arc, Circle's stablecoin L1. A few properties matter for how the agent works:
+
+- **USDC is the gas token.** Arc uses USDC for transaction fees — not ETH. The faucet gives you testnet USDC that covers both gas and x402 payments in a single token. No ETH needed.
+- **Sub-second finality.** Transactions confirm in under one second. The agent does not need to poll or wait for confirmations before acting.
+- **EVM compatible.** Standard Solidity contracts and EVM tooling (viem, ethers.js, Hardhat, Foundry) work as-is. See [EVM differences](https://docs.arc.io/arc/references/evm-differences).
+- **Native agent standards.** Arc defines [ERC-8004](https://docs.arc.io/arc/tutorials/register-your-first-ai-agent) (onchain agent identity and reputation) and [ERC-8183](https://docs.arc.io/arc/tutorials/create-your-first-erc-8183-job) (job escrow and USDC settlement) — purpose-built for agents that transact autonomously like PolyArc.
 
 ---
 
@@ -115,10 +126,10 @@ Never commit your `.env` file — it is already protected by `.gitignore`.
 
 ## Security Notes
 
-- **Agent wallet is developer-controlled.** Circle's MPC technology means no raw private key is ever exposed in code.
+- **Agent wallet is developer-controlled.** The private key is stored in your local `.env` only — never committed and never exposed in code.
 - **Budget is enforced server-side.** The frontend cannot override the $0.10 session cap.
 - **Testnet only.** All USDC is test currency. No real money is at risk.
-- **x402 payments are signed fresh each time.** No standing payment authorization — every call requires a new signature.
+- **x402 payments are signed fresh each time.** No standing payment authorization — every call requires a new EIP-712 signature.
 - **API keys live in environment variables.** Never hardcoded anywhere in the source.
 
 ---
@@ -129,6 +140,9 @@ Never commit your `.env` file — it is already protected by `.gitignore`.
 - Provider routing — compare two AI providers per query and pick the cheaper one
 - Sub-cent payments via Circle Nanopayments batching (currently $0.05, target $0.001)
 - Portfolio tracker for users with active Polymarket positions
+- **Unified Balance** — fund the agent from any chain (Base, Solana, Ethereum) using Arc's [Unified Balance](https://docs.arc.io/app-kit/unified-balance) so users don't need Arc Testnet USDC specifically
+- **ERC-8004 agent identity** — register PolyArc as an onchain agent with verifiable identity and reputation using Arc's native [AI agent registry](https://docs.arc.io/arc/tutorials/register-your-first-ai-agent)
+- **ERC-8183 job escrow** — model premium analysis requests as on-chain jobs with USDC escrow and settlement, using Arc's [job standard](https://docs.arc.io/arc/tutorials/create-your-first-erc-8183-job)
 - Arc Mainnet when available
 
 ---
@@ -139,7 +153,7 @@ Built for the **Canteen x Arc Hackathon** — deadline July 6, 2026.
 
 - **GitHub:** [github.com/kamitakami687/polyarc](https://github.com/kamitakami687/polyarc)
 - **Demo video:** *(add your Loom link here)*
-- **Live demo:** *(add your Replit link here)*
+- **Live demo:** *(add your demo URL here)*
 
 ---
 
