@@ -8,514 +8,232 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --navy:    #060d1a;
-      --ocean:   #091525;
-      --deep:    #0a1f35;
-      --turq:    #40E0D0;
-      --turq2:   #2bc8b8;
-      --turq3:   #1aa898;
-      --white:   #ffffff;
-      --offwhite:#e8f4f8;
-      --muted:   #7ba8c0;
-      --border:  rgba(64,224,208,0.1);
+      --navy: #060d1a;
+      --turq: #40E0D0;
+      --turq2: #2bc8b8;
+      --white: #ffffff;
+      --muted: #7ba8c0;
+      --offwhite: #e8f4f8;
+      --border: rgba(64,224,208,0.1);
     }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--navy);
-      color: var(--white);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* CANVAS WAVE BG */
-    #wave-canvas {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
-    }
-
-    /* everything above canvas */
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--white); line-height: 1.6; overflow-x: hidden; }
+    #wave-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     nav, section, .status-section, footer { position: relative; z-index: 1; }
-
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2.5rem;
-      background: rgba(6,13,26,0.75);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo-mark {
-      width: 34px; height: 34px; border-radius: 9px;
-      background: var(--turq);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px;
-      color: var(--navy);
-    }
-    .nav-logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 18px; color: var(--white); }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1rem 2.5rem; background: rgba(6,13,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-mark { width: 34px; height: 34px; border-radius: 9px; background: var(--turq); display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: var(--navy); }
+    .logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 18px; color: var(--white); }
     .nav-links { display: flex; gap: 2rem; list-style: none; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
     .nav-links a:hover { color: var(--white); }
-    .btn-turq {
-      background: var(--turq); color: var(--navy);
-      padding: 9px 22px; border-radius: 9px; font-weight: 700; font-size: 14px;
-      cursor: pointer; text-decoration: none; transition: all 0.2s;
-      font-family: 'Inter', sans-serif; border: none; display: inline-block;
-      box-shadow: 0 0 20px rgba(64,224,208,0.3);
-    }
-    .btn-turq:hover { background: var(--turq2); transform: translateY(-2px); box-shadow: 0 0 32px rgba(64,224,208,0.5); }
-    .btn-outline {
-      background: transparent; color: var(--turq);
-      padding: 9px 22px; border-radius: 9px; font-weight: 600; font-size: 14px;
-      text-decoration: none; border: 1.5px solid var(--turq);
-      transition: all 0.2s; display: inline-block;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-outline:hover { background: rgba(64,224,208,0.08); transform: translateY(-2px); }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 8rem 2rem 5rem;
-    }
-    .hero-eyebrow {
-      font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 500;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--turq); margin-bottom: 1.5rem;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .hero-eyebrow::before, .hero-eyebrow::after {
-      content: ''; display: block; width: 32px; height: 1px; background: var(--turq); opacity: 0.5;
-    }
-    .hero h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2.8rem, 7vw, 5.5rem);
-      font-weight: 700; line-height: 1.05;
-      letter-spacing: -0.02em; margin-bottom: 1.5rem;
-      text-shadow: 0 0 80px rgba(64,224,208,0.15);
-    }
-    .hero h1 span { color: var(--turq); }
-    .hero-sub {
-      font-size: clamp(1rem, 2vw, 1.15rem);
-      color: var(--muted); max-width: 540px;
-      margin: 0 auto 2.5rem; line-height: 1.75;
-    }
-    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-    .badge {
-      margin-top: 3rem;
-      display: inline-flex; align-items: center; gap: 10px;
-      background: rgba(64,224,208,0.07); border: 1px solid rgba(64,224,208,0.2);
-      border-radius: 100px; padding: 8px 20px;
-      font-size: 13px; color: var(--turq);
-    }
-    .badge-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--turq);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(64,224,208,0.4)} 50%{opacity:0.7;box-shadow:0 0 0 6px rgba(64,224,208,0)} }
-
-    /* SECTIONS */
+    .btn { background: var(--turq); color: var(--navy); padding: 10px 24px; border-radius: 9px; font-weight: 700; font-size: 14px; text-decoration: none; border: none; display: inline-block; box-shadow: 0 0 20px rgba(64,224,208,0.3); transition: all 0.2s; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn:hover { background: var(--turq2); transform: translateY(-2px); box-shadow: 0 0 32px rgba(64,224,208,0.5); }
+    .btn-out { background: transparent; color: var(--turq); padding: 10px 24px; border-radius: 9px; font-weight: 600; font-size: 14px; text-decoration: none; border: 1.5px solid var(--turq); display: inline-block; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .btn-out:hover { background: rgba(64,224,208,0.08); transform: translateY(-2px); }
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 8rem 2rem 5rem; }
+    .eyebrow { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--turq); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+    .eyebrow::before, .eyebrow::after { content: ''; display: block; width: 32px; height: 1px; background: var(--turq); opacity: 0.5; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+    h1 span { color: var(--turq); }
+    .sub { font-size: 1.1rem; color: var(--muted); max-width: 540px; margin: 0 auto 2.5rem; line-height: 1.75; }
+    .actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .badge { margin-top: 3rem; display: inline-flex; align-items: center; gap: 10px; background: rgba(64,224,208,0.07); border: 1px solid rgba(64,224,208,0.2); border-radius: 100px; padding: 8px 20px; font-size: 13px; color: var(--turq); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--turq); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     .section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
-    .section-label {
-      font-size: 12px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--turq); margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif;
-    }
-    .section-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700;
-      line-height: 1.15; margin-bottom: 1rem; letter-spacing: -0.01em;
-    }
-    .section-sub { color: var(--muted); font-size: 1rem; max-width: 500px; line-height: 1.7; }
-
-    /* STEPS */
+    .label { font-size: 12px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--turq); margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif; }
+    h2 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.15; margin-bottom: 1rem; letter-spacing: -0.01em; }
+    .desc { color: var(--muted); font-size: 1rem; max-width: 500px; line-height: 1.7; }
     .steps { margin-top: 4rem; display: flex; flex-direction: column; }
-    .step {
-      display: flex; gap: 2rem; align-items: flex-start;
-      padding: 2rem 0; border-top: 1px solid rgba(64,224,208,0.08);
-    }
+    .step { display: flex; gap: 2rem; padding: 2rem 0; border-top: 1px solid rgba(64,224,208,0.08); }
     .step:last-child { border-bottom: 1px solid rgba(64,224,208,0.08); }
-    .step-num {
-      font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
-      color: var(--turq); min-width: 28px; padding-top: 3px; letter-spacing: 0.05em;
-    }
-    .step-body h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
-    .step-body p { color: var(--muted); font-size: 0.92rem; line-height: 1.7; }
-    .step-tag {
-      display: inline-block; margin-top: 10px;
-      background: rgba(64,224,208,0.08); border: 1px solid rgba(64,224,208,0.18);
-      color: var(--turq); font-size: 11px; font-weight: 500; padding: 3px 10px;
-      border-radius: 100px;
-    }
-    .step-tag.pay { background: rgba(64,224,208,0.14); border-color: rgba(64,224,208,0.35); }
-
-    /* FEATURES */
-    .features-grid {
-      margin-top: 3.5rem;
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1px; background: rgba(64,224,208,0.08);
-      border-radius: 16px; overflow: hidden; border: 1px solid rgba(64,224,208,0.08);
-    }
-    .feature-card {
-      background: rgba(9,21,37,0.85); padding: 2rem;
-      transition: background 0.2s; backdrop-filter: blur(8px);
-    }
-    .feature-card:hover { background: rgba(14,31,53,0.95); }
-    .feature-icon {
-      width: 42px; height: 42px; border-radius: 10px; margin-bottom: 1rem;
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
-      background: rgba(64,224,208,0.1); border: 1px solid rgba(64,224,208,0.15);
-    }
-    .feature-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
-    .feature-card p { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
-
-    /* STATUS */
-    .status-section {
-      padding: 6rem 2rem;
-      background: rgba(9,21,37,0.7);
-      border-top: 1px solid rgba(64,224,208,0.08);
-      border-bottom: 1px solid rgba(64,224,208,0.08);
-      backdrop-filter: blur(12px);
-    }
+    .num { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--turq); min-width: 28px; padding-top: 3px; }
+    .step h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+    .step p { color: var(--muted); font-size: 0.92rem; line-height: 1.7; }
+    .tag { display: inline-block; margin-top: 10px; background: rgba(64,224,208,0.08); border: 1px solid rgba(64,224,208,0.18); color: var(--turq); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 100px; }
+    .grid { margin-top: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: rgba(64,224,208,0.08); border-radius: 16px; overflow: hidden; border: 1px solid rgba(64,224,208,0.08); }
+    .card { background: rgba(9,21,37,0.85); padding: 2rem; transition: background 0.2s; }
+    .card:hover { background: rgba(14,31,53,0.95); }
+    .icon { width: 42px; height: 42px; border-radius: 10px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; font-size: 20px; background: rgba(64,224,208,0.1); border: 1px solid rgba(64,224,208,0.15); }
+    .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .card p { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
+    .status-section { padding: 6rem 2rem; background: rgba(9,21,37,0.7); border-top: 1px solid rgba(64,224,208,0.08); border-bottom: 1px solid rgba(64,224,208,0.08); }
     .status-inner { max-width: 800px; margin: 0 auto; }
-    .status-table { width: 100%; border-collapse: collapse; margin-top: 2.5rem; }
-    .status-table tr { border-bottom: 1px solid rgba(64,224,208,0.07); }
-    .status-table tr:last-child { border-bottom: none; }
-    .status-table td { padding: 13px 0; font-size: 14px; }
-    .status-table td:first-child { color: var(--offwhite); width: 70%; }
-    .status-table td:last-child { text-align: right; }
-    .tag-live { color: var(--turq); font-weight: 500; }
-    .tag-prog { color: #fbbf24; font-weight: 500; }
-    .tag-soon { color: var(--muted); font-weight: 500; }
-
-    /* STACK */
-    .stack-grid {
-      margin-top: 3rem;
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
-    }
-    .stack-card {
-      background: rgba(9,21,37,0.7); border: 1px solid rgba(64,224,208,0.1);
-      border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);
-      transition: border-color 0.2s;
-    }
-    .stack-card:hover { border-color: rgba(64,224,208,0.3); }
-    .stack-label { font-size: 11px; color: var(--turq); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; opacity: 0.8; }
-    .stack-value { font-family: 'Space Grotesk', sans-serif; font-size: 0.92rem; font-weight: 500; }
-
-    /* CTA */
-    .cta-section { padding: 8rem 2rem; text-align: center; }
-    .cta-section h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700;
-      letter-spacing: -0.02em; margin-bottom: 1rem;
-    }
-    .cta-section p { color: var(--muted); font-size: 1.05rem; margin-bottom: 2.5rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 2.5rem; }
+    tr { border-bottom: 1px solid rgba(64,224,208,0.07); }
+    tr:last-child { border-bottom: none; }
+    td { padding: 13px 0; font-size: 14px; }
+    td:first-child { color: var(--offwhite); width: 70%; }
+    td:last-child { text-align: right; }
+    .live { color: var(--turq); font-weight: 500; }
+    .prog { color: #fbbf24; font-weight: 500; }
+    .soon { color: var(--muted); font-weight: 500; }
+    .stack { margin-top: 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .scard { background: rgba(9,21,37,0.7); border: 1px solid rgba(64,224,208,0.1); border-radius: 12px; padding: 1.25rem; transition: border-color 0.2s; }
+    .scard:hover { border-color: rgba(64,224,208,0.3); }
+    .slabel { font-size: 11px; color: var(--turq); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; opacity: 0.8; }
+    .sval { font-family: 'Space Grotesk', sans-serif; font-size: 0.92rem; font-weight: 500; }
+    .cta { padding: 8rem 2rem; text-align: center; }
+    .cta h2 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+    .cta p { color: var(--muted); font-size: 1.05rem; margin-bottom: 2.5rem; }
     .cta-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid rgba(64,224,208,0.08);
-      padding: 2rem 2.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 13px; color: var(--muted); flex-wrap: wrap; gap: 1rem;
-      background: rgba(6,13,26,0.8); backdrop-filter: blur(12px);
-    }
+    footer { border-top: 1px solid rgba(64,224,208,0.08); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--muted); flex-wrap: wrap; gap: 1rem; background: rgba(6,13,26,0.8); }
     footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: var(--turq); }
-    .footer-right { display: flex; gap: 1.5rem; }
-
-    @media (max-width: 640px) {
-      nav { padding: 1rem 1.25rem; }
-      .nav-links { display: none; }
-      .section { padding: 4rem 1.25rem; }
-    }
+    .flinks { display: flex; gap: 1.5rem; }
+    @media(max-width:640px){ nav{padding:1rem 1.25rem;} .nav-links{display:none;} .section{padding:4rem 1.25rem;} }
   </style>
 </head>
 <body>
-
 <canvas id="wave-canvas"></canvas>
-
 <nav>
-  <a href="#" class="nav-logo">
-    <div class="nav-logo-mark">P</div>
-    <span class="nav-logo-text">PolyArc</span>
-  </a>
+  <a href="#" class="logo"><div class="logo-mark">P</div><span class="logo-text">PolyArc</span></a>
   <ul class="nav-links">
     <li><a href="#how">How it works</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#status">What's live</a></li>
     <li><a href="#stack">Tech</a></li>
   </ul>
-  <a href="https://github.com/kamitakami687/polyarc" target="_blank" class="btn-turq">View on GitHub</a>
+  <a href="https://github.com/kamitakami687/polyarc" target="_blank" class="btn">View on GitHub</a>
 </nav>
-
-<!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">Arc L1 Blockchain · x402 Protocol</div>
+  <div class="eyebrow">Arc L1 Blockchain · x402 Protocol</div>
   <h1>Research markets.<br><span>Pay only when<br>it matters.</span></h1>
-  <p class="hero-sub">PolyArc is an autonomous AI agent that reads live Polymarket prediction markets, searches free sources first, and pays for premium analysis only when the insight is worth the cost.</p>
-  <div class="hero-actions">
-    <a href="https://github.com/kamitakami687/polyarc" target="_blank" class="btn-turq">View on GitHub</a>
-    <a href="#how" class="btn-outline">See how it works</a>
+  <p class="sub">PolyArc is an autonomous AI agent that reads live Polymarket prediction markets, searches free sources first, and pays for premium analysis only when the insight is worth the cost.</p>
+  <div class="actions">
+    <a href="https://github.com/kamitakami687/polyarc" target="_blank" class="btn">View on GitHub</a>
+    <a href="#how" class="btn-out">See how it works</a>
   </div>
-  <div class="badge">
-    <div class="badge-dot"></div>
-    Live on Arc Testnet · $0.05 per premium analysis via x402
-  </div>
+  <div class="badge"><div class="dot"></div>Live on Arc Testnet · $0.05 per premium analysis via x402</div>
 </section>
-
-<!-- HOW IT WORKS -->
 <section class="section" id="how">
-  <div class="section-label">How it works</div>
-  <h2 class="section-title">Free first.<br>Pay only when needed.</h2>
-  <p class="section-sub">The agent makes a cost-vs-value decision on every query. No human approves individual payments.</p>
+  <div class="label">How it works</div>
+  <h2>Free first. Pay only when needed.</h2>
+  <p class="desc">The agent makes a cost-vs-value decision on every query. No human approves individual payments.</p>
   <div class="steps">
-    <div class="step">
-      <div class="step-num">01</div>
-      <div class="step-body">
-        <h3>You type a market question</h3>
-        <p>Ask anything — "Will Bitcoin hit $200k?", "Who wins the 2026 midterms?" — or pick from suggested topics.</p>
-        <span class="step-tag">Free</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <div class="step-body">
-        <h3>Agent fetches live Polymarket odds</h3>
-        <p>PolyArc pulls the current prediction market odds for your question in real time via the Polymarket public API.</p>
-        <span class="step-tag">Free</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <div class="step-body">
-        <h3>Searches free sources first</h3>
-        <p>Wikipedia, DuckDuckGo, and Google News are checked before spending anything. If the free data is good enough, the agent stops and writes a report.</p>
-        <span class="step-tag">Free</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">04</div>
-      <div class="step-body">
-        <h3>Decides: is premium data worth it?</h3>
-        <p>The agent scores the confidence of free research. If there's an information gap, it triggers a premium payment. If not, it saves your budget.</p>
-        <span class="step-tag">AI decision</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">05</div>
-      <div class="step-body">
-        <h3>Autonomously pays $0.05 USDC via x402</h3>
-        <p>No human click required. The agent signs a USDC payment on Arc Testnet — the payment is the authentication. GPT-4o returns the deep analysis.</p>
-        <span class="step-tag pay">x402 payment · Arc Testnet</span>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">06</div>
-      <div class="step-body">
-        <h3>You get a full research report</h3>
-        <p>Current odds, research summary, whether the market looks mispriced, total cost, and a Payment Trace showing every on-chain transaction.</p>
-        <span class="step-tag">Report delivered</span>
-      </div>
-    </div>
+    <div class="step"><div class="num">01</div><div><h3>You type a market question</h3><p>Ask anything — "Will Bitcoin hit $200k?", "Who wins the 2026 midterms?" — or pick from suggested topics.</p><span class="tag">Free</span></div></div>
+    <div class="step"><div class="num">02</div><div><h3>Agent fetches live Polymarket odds</h3><p>PolyArc pulls the current prediction market odds for your question in real time via the Polymarket public API.</p><span class="tag">Free</span></div></div>
+    <div class="step"><div class="num">03</div><div><h3>Searches free sources first</h3><p>Wikipedia, DuckDuckGo, and Google News are checked before spending anything. If the free data is good enough, the agent stops and writes a report.</p><span class="tag">Free</span></div></div>
+    <div class="step"><div class="num">04</div><div><h3>Decides: is premium data worth it?</h3><p>The agent scores the confidence of free research. If there is an information gap, it triggers a premium payment. If not, it saves your budget.</p><span class="tag">AI decision</span></div></div>
+    <div class="step"><div class="num">05</div><div><h3>Autonomously pays $0.05 USDC via x402</h3><p>No human click required. The agent signs a USDC payment on Arc Testnet. GPT-4o returns the deep analysis.</p><span class="tag">x402 payment · Arc Testnet</span></div></div>
+    <div class="step"><div class="num">06</div><div><h3>You get a full research report</h3><p>Current odds, research summary, whether the market looks mispriced, total cost, and a Payment Trace showing every on-chain transaction.</p><span class="tag">Report delivered</span></div></div>
   </div>
 </section>
-
-<!-- FEATURES -->
 <section class="section" id="features" style="padding-top:0">
-  <div class="section-label">Features</div>
-  <h2 class="section-title">What makes it different</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🧠</div>
-      <h3>Cost-vs-value decision engine</h3>
-      <p>Evaluates every query autonomously. Decides whether premium data is worth paying for. Most queries never trigger a payment.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Autonomous x402 payments</h3>
-      <p>No human approves individual transactions. The agent holds USDC and pays via x402 the same way your browser loads a webpage.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>Live Polymarket odds</h3>
-      <p>Real-time prediction market data from Polymarket's public API. See exactly what the market thinks before the agent weighs in.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">💰</div>
-      <h3>Hard budget cap</h3>
-      <p>$0.10 USDC per session, enforced server-side. The agent cannot overspend — ever. Budget resets each session.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🧾</div>
-      <h3>Full payment trace</h3>
-      <p>Every on-chain payment is logged: timestamp, amount, which resource was purchased, and the agent's reasoning for paying.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔒</div>
-      <h3>Testnet safe</h3>
-      <p>All USDC is test currency on Arc Testnet. No real money at risk. API keys stored in environment variables, never in code.</p>
-    </div>
+  <div class="label">Features</div>
+  <h2>What makes it different</h2>
+  <div class="grid">
+    <div class="card"><div class="icon">🧠</div><h3>Cost-vs-value decision engine</h3><p>Evaluates every query autonomously. Most queries never trigger a payment.</p></div>
+    <div class="card"><div class="icon">⚡</div><h3>Autonomous x402 payments</h3><p>No human approves individual transactions. The agent pays via x402 the same way your browser loads a webpage.</p></div>
+    <div class="card"><div class="icon">📊</div><h3>Live Polymarket odds</h3><p>Real-time prediction market data from Polymarket's public API before the agent weighs in.</p></div>
+    <div class="card"><div class="icon">💰</div><h3>Hard budget cap</h3><p>$0.10 USDC per session, enforced server-side. The agent cannot overspend — ever.</p></div>
+    <div class="card"><div class="icon">🧾</div><h3>Full payment trace</h3><p>Every on-chain payment is logged: timestamp, amount, resource purchased, and reasoning.</p></div>
+    <div class="card"><div class="icon">🔒</div><h3>Testnet safe</h3><p>All USDC is test currency. No real money at risk. API keys stored in environment variables.</p></div>
   </div>
 </section>
-
-<!-- STATUS -->
 <div class="status-section" id="status">
   <div class="status-inner">
-    <div class="section-label">Honesty table</div>
-    <h2 class="section-title" style="font-size:2rem">What's actually live today</h2>
+    <div class="label">Honesty table</div>
+    <h2 style="font-size:2rem">What's actually live today</h2>
     <p style="color:var(--muted);font-size:0.93rem;margin-top:0.5rem">This table is kept current. Trust it over any pitch deck or demo video.</p>
-    <table class="status-table">
-      <tr><td>Live Polymarket odds fetching</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>Free source research (Wikipedia, DuckDuckGo, Google News)</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>Autonomous x402 payment for premium GPT-4o analysis</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>$0.10 session budget with real-time tracker</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>Payment Trace tab with on-chain history</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>Cost-vs-value decision engine (pay or skip)</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>One-click suggested market topics</td><td class="tag-live">✅ Live</td></tr>
-      <tr><td>Multi-market comparison in one session</td><td class="tag-prog">🛠 In progress</td></tr>
-      <tr><td>Portfolio tracker for Polymarket positions</td><td class="tag-soon">❌ Not built yet</td></tr>
-      <tr><td>Mainnet USDC (real money)</td><td class="tag-soon">❌ Testnet only</td></tr>
+    <table>
+      <tr><td>Live Polymarket odds fetching</td><td class="live">✅ Live</td></tr>
+      <tr><td>Free source research (Wikipedia, DuckDuckGo, Google News)</td><td class="live">✅ Live</td></tr>
+      <tr><td>Autonomous x402 payment for premium GPT-4o analysis</td><td class="live">✅ Live</td></tr>
+      <tr><td>$0.10 session budget with real-time tracker</td><td class="live">✅ Live</td></tr>
+      <tr><td>Payment Trace tab with on-chain history</td><td class="live">✅ Live</td></tr>
+      <tr><td>Cost-vs-value decision engine (pay or skip)</td><td class="live">✅ Live</td></tr>
+      <tr><td>One-click suggested market topics</td><td class="live">✅ Live</td></tr>
+      <tr><td>Multi-market comparison in one session</td><td class="prog">🛠 In progress</td></tr>
+      <tr><td>Portfolio tracker for Polymarket positions</td><td class="soon">❌ Not built yet</td></tr>
+      <tr><td>Mainnet USDC (real money)</td><td class="soon">❌ Testnet only</td></tr>
     </table>
   </div>
 </div>
-
-<!-- STACK -->
 <section class="section" id="stack">
-  <div class="section-label">Tech stack</div>
-  <h2 class="section-title">Built on</h2>
-  <div class="stack-grid">
-    <div class="stack-card"><div class="stack-label">Blockchain</div><div class="stack-value">Arc Testnet — Circle's stablecoin L1</div></div>
-    <div class="stack-card"><div class="stack-label">Payments</div><div class="stack-value">x402 protocol · Circle Gateway · USDC</div></div>
-    <div class="stack-card"><div class="stack-label">AI</div><div class="stack-value">OpenAI GPT-4o · GPT-4o mini</div></div>
-    <div class="stack-card"><div class="stack-label">Market data</div><div class="stack-value">Polymarket public API</div></div>
-    <div class="stack-card"><div class="stack-label">Free research</div><div class="stack-value">Wikipedia · DuckDuckGo · Google News</div></div>
-    <div class="stack-card"><div class="stack-label">Backend</div><div class="stack-value">Node.js · TypeScript · Express</div></div>
+  <div class="label">Tech stack</div>
+  <h2>Built on</h2>
+  <div class="stack">
+    <div class="scard"><div class="slabel">Blockchain</div><div class="sval">Arc Testnet — Circle's stablecoin L1</div></div>
+    <div class="scard"><div class="slabel">Payments</div><div class="sval">x402 protocol · Circle Gateway · USDC</div></div>
+    <div class="scard"><div class="slabel">AI</div><div class="sval">OpenAI GPT-4o · GPT-4o mini</div></div>
+    <div class="scard"><div class="slabel">Market data</div><div class="sval">Polymarket public API</div></div>
+    <div class="scard"><div class="slabel">Free research</div><div class="sval">Wikipedia · DuckDuckGo · Google News</div></div>
+    <div class="scard"><div class="slabel">Backend</div><div class="sval">Node.js · TypeScript · Express</div></div>
   </div>
 </section>
-
-<!-- CTA -->
-<section class="cta-section">
+<section class="cta">
   <h2>Ready to see it work?</h2>
   <p>Working testnet demo. Not slides. Try it yourself.</p>
   <div class="cta-links">
-    <a href="https://github.com/kamitakami687/polyarc" target="_blank" class="btn-turq">View on GitHub</a>
-    <a href="#how" class="btn-outline">How it works</a>
+    <a href="https://github.com/kamitakami687/polyarc" target="_blank" class="btn">View on GitHub</a>
+    <a href="#how" class="btn-out">How it works</a>
   </div>
 </section>
-
 <footer>
-  <div style="display:flex;align-items:center;gap:10px">
-    <div class="nav-logo-mark" style="width:26px;height:26px;font-size:13px">P</div>
-    <span>PolyArc — Canteen x Arc Hackathon 2026</span>
-  </div>
-  <div class="footer-right">
+  <div style="display:flex;align-items:center;gap:10px"><div class="logo-mark" style="width:26px;height:26px;font-size:13px">P</div><span>PolyArc — Canteen x Arc Hackathon 2026</span></div>
+  <div class="flinks">
     <a href="https://github.com/kamitakami687/polyarc" target="_blank">GitHub</a>
     <a href="https://www.arc.io" target="_blank">Arc</a>
     <a href="https://x402.org" target="_blank">x402</a>
     <a href="https://polymarket.com" target="_blank">Polymarket</a>
   </div>
 </footer>
-
 <script>
-const canvas = document.getElementById('wave-canvas');
-const ctx = canvas.getContext('2d');
-let W, H, t = 0;
-
-function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
-
-// 3D ocean wave layers - multiple sine waves at different depths/speeds
-const layers = [
-  { amp: 38, freq: 0.012, speed: 0.018, y: 0.55, alpha: 0.18, color: '#40E0D0' },
-  { amp: 28, freq: 0.018, speed: 0.025, y: 0.60, alpha: 0.12, color: '#2bc8b8' },
-  { amp: 22, freq: 0.022, speed: 0.032, y: 0.65, alpha: 0.10, color: '#1aa898' },
-  { amp: 55, freq: 0.008, speed: 0.010, y: 0.50, alpha: 0.08, color: '#40E0D0' },
-  { amp: 18, freq: 0.030, speed: 0.040, y: 0.70, alpha: 0.07, color: '#0d7377' },
-  { amp: 42, freq: 0.006, speed: 0.007, y: 0.45, alpha: 0.06, color: '#40E0D0' },
-  { amp: 14, freq: 0.040, speed: 0.055, y: 0.75, alpha: 0.05, color: '#2bc8b8' },
-  // deep background waves
-  { amp: 70, freq: 0.004, speed: 0.005, y: 0.40, alpha: 0.04, color: '#40E0D0' },
-  { amp: 10, freq: 0.055, speed: 0.070, y: 0.80, alpha: 0.04, color: '#1aa898' },
+const canvas=document.getElementById('wave-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,t=0,last=0;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+window.addEventListener('resize',resize);resize();
+const layers=[
+  {amp:38,freq:0.012,speed:0.018,y:0.55,alpha:0.18,color:'#40E0D0'},
+  {amp:28,freq:0.018,speed:0.025,y:0.60,alpha:0.12,color:'#2bc8b8'},
+  {amp:22,freq:0.022,speed:0.032,y:0.65,alpha:0.10,color:'#1aa898'},
+  {amp:55,freq:0.008,speed:0.010,y:0.50,alpha:0.08,color:'#40E0D0'},
+  {amp:18,freq:0.030,speed:0.040,y:0.70,alpha:0.07,color:'#0d7377'},
+  {amp:42,freq:0.006,speed:0.007,y:0.45,alpha:0.06,color:'#40E0D0'},
+  {amp:14,freq:0.040,speed:0.055,y:0.75,alpha:0.05,color:'#2bc8b8'},
+  {amp:70,freq:0.004,speed:0.005,y:0.40,alpha:0.04,color:'#40E0D0'},
+  {amp:10,freq:0.055,speed:0.070,y:0.80,alpha:0.04,color:'#1aa898'},
 ];
-
-function drawWave(layer, time) {
-  const baseY = layer.y * H;
-  ctx.beginPath();
-  ctx.moveTo(0, H);
-  for (let x = 0; x <= W; x += 2) {
-    // combine two sine waves for more organic 3D ocean feel
-    const y = baseY
-      + Math.sin(x * layer.freq + time * layer.speed * 60) * layer.amp
-      + Math.sin(x * layer.freq * 1.7 + time * layer.speed * 60 * 0.8 + 1.2) * (layer.amp * 0.4)
-      + Math.sin(x * layer.freq * 0.5 + time * layer.speed * 60 * 1.3 + 2.5) * (layer.amp * 0.25);
-    ctx.lineTo(x, y);
+function drawWave(l,time){
+  const baseY=l.y*H;
+  ctx.beginPath();ctx.moveTo(0,H);
+  for(let x=0;x<=W;x+=2){
+    const y=baseY+Math.sin(x*l.freq+time*l.speed*60)*l.amp+Math.sin(x*l.freq*1.7+time*l.speed*60*0.8+1.2)*(l.amp*0.4)+Math.sin(x*l.freq*0.5+time*l.speed*60*1.3+2.5)*(l.amp*0.25);
+    ctx.lineTo(x,y);
   }
-  ctx.lineTo(W, H);
-  ctx.closePath();
-
-  // gradient fill for depth effect
-  const grad = ctx.createLinearGradient(0, baseY - layer.amp, 0, H);
-  grad.addColorStop(0, layer.color + Math.round(layer.alpha * 255).toString(16).padStart(2,'0'));
-  grad.addColorStop(1, 'transparent');
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // glowing crest line
+  ctx.lineTo(W,H);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,baseY-l.amp,0,H);
+  grad.addColorStop(0,l.color+Math.round(l.alpha*255).toString(16).padStart(2,'0'));
+  grad.addColorStop(1,'transparent');
+  ctx.fillStyle=grad;ctx.fill();
   ctx.beginPath();
-  for (let x = 0; x <= W; x += 2) {
-    const y = baseY
-      + Math.sin(x * layer.freq + time * layer.speed * 60) * layer.amp
-      + Math.sin(x * layer.freq * 1.7 + time * layer.speed * 60 * 0.8 + 1.2) * (layer.amp * 0.4)
-      + Math.sin(x * layer.freq * 0.5 + time * layer.speed * 60 * 1.3 + 2.5) * (layer.amp * 0.25);
-    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  for(let x=0;x<=W;x+=2){
+    const y=baseY+Math.sin(x*l.freq+time*l.speed*60)*l.amp+Math.sin(x*l.freq*1.7+time*l.speed*60*0.8+1.2)*(l.amp*0.4)+Math.sin(x*l.freq*0.5+time*l.speed*60*1.3+2.5)*(l.amp*0.25);
+    x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
   }
-  ctx.strokeStyle = layer.color + Math.round(Math.min(layer.alpha * 2.5, 0.5) * 255).toString(16).padStart(2,'0');
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
+  ctx.strokeStyle=l.color+Math.round(Math.min(l.alpha*2.5,0.5)*255).toString(16).padStart(2,'0');
+  ctx.lineWidth=1.2;ctx.stroke();
 }
-
-let last = 0;
-function animate(ts) {
-  const dt = (ts - last) / 1000;
-  last = ts;
-  t += dt;
-
-  ctx.clearRect(0, 0, W, H);
-
-  // deep ocean background gradient
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0,   '#060d1a');
-  bg.addColorStop(0.4, '#091525');
-  bg.addColorStop(0.7, '#0a1f35');
-  bg.addColorStop(1,   '#060d1a');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // draw waves back to front (largest first)
-  [...layers].reverse().forEach(l => drawWave(l, t));
-
-  // subtle shimmer particles on wave crests
-  if (Math.random() < 0.3) {
-    const px = Math.random() * W;
-    const layer = layers[Math.floor(Math.random() * 4)];
-    const py = layer.y * H
-      + Math.sin(px * layer.freq + t * layer.speed * 60) * layer.amp;
-    ctx.beginPath();
-    ctx.arc(px, py, Math.random() * 1.5 + 0.5, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(64,224,208,0.6)';
-    ctx.fill();
+function animate(ts){
+  const dt=(ts-last)/1000;last=ts;t+=dt;
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#060d1a');bg.addColorStop(0.4,'#091525');bg.addColorStop(0.7,'#0a1f35');bg.addColorStop(1,'#060d1a');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  [...layers].reverse().forEach(l=>drawWave(l,t));
+  if(Math.random()<0.3){
+    const px=Math.random()*W;
+    const l=layers[Math.floor(Math.random()*4)];
+    const py=l.y*H+Math.sin(px*l.freq+t*l.speed*60)*l.amp;
+    ctx.beginPath();ctx.arc(px,py,Math.random()*1.5+0.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(64,224,208,0.6)';ctx.fill();
   }
-
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
 </script>
 </body>
-</html>
+</html> 
