@@ -148,5 +148,3 @@ Built for the **Canteen x Arc Hackathon** — deadline July 6, 2026.
 PolyArc is a working testnet demo of autonomous AI payments on Arc Testnet.
 
 The core idea is simple: an agent that discovers, evaluates, and pays for information — but only when the value of that information is worth the cost. That principle applies to prediction markets today, and to any paywalled data source tomorrow.
-
-Built by a complete beginner in one day using Replit Agent, Circle's Agent Stack, and the x402 protocol.
